@@ -1,5 +1,4 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
-import { V4MAPPED } from "dns";
 import { v4 as uuid } from "uuid";
 import { document } from "../utils/dynamoClient";
 
