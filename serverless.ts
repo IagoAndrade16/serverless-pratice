@@ -3,7 +3,7 @@ import type { AWS } from '@serverless/typescript';
 const serverlessConfiguration: AWS = {
   service: 'serverless-pratice',
   frameworkVersion: '3',
-  plugins: ['serverless-esbuild'],
+  plugins: ['serverless-esbuild', 'serverless-offline'],
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
@@ -17,7 +17,20 @@ const serverlessConfiguration: AWS = {
     },
   },
   // import the function via paths
-  functions: {  },
+  functions: { 
+    createTodo: {
+      handler: "src/functions/createTodo.handler",
+      events: [
+        {
+          http: {
+            path: "create",
+            method: "post",
+            cors: true,
+          }
+        }
+      ]
+    }
+   },
   package: { individually: true },
   custom: {
     esbuild: {
@@ -31,6 +44,32 @@ const serverlessConfiguration: AWS = {
       concurrency: 10,
     },
   },
+  resources: {
+    Resources: {
+      dbTodos: {
+        Type: "AWS::DynamoDB::Table",
+        Properties: {
+          TableName: "todos",
+          ProvisionedThroughput: {
+            ReadCapacityUnits: 5,
+            WriteCapacityUnits: 5
+          },
+          AttributeDefinitions: [
+            {
+              AttributeName: "id",
+              AttributeType: "S"
+            }
+          ],
+          KeySchema: [
+            {
+              AttributeName: "id",
+              KeyType: "HASH"
+            }
+          ]
+        }
+      }
+    }
+  }
 };
 
 module.exports = serverlessConfiguration;
